@@ -1,0 +1,2 @@
+include ':app', ':androidx-skin'
+rootProject.name='ThridLib'
