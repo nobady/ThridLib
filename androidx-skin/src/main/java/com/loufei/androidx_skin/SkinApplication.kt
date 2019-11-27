@@ -9,8 +9,9 @@ class SkinApplication:Application() {
 
     override fun onCreate() {
         super.onCreate()
-
-        registerActivityLifecycleCallbacks(SkinActivityLifecycleCallback())
+        SkinManager.init(this)
+        SkinManager.loadSkinPath("皮肤路径")
+        SkinManager.changeSkin()
     }
 
 }

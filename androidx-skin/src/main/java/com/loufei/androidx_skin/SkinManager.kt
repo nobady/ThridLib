@@ -2,6 +2,7 @@ package com.loufei.androidx_skin
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.AssetManager
@@ -38,8 +39,9 @@ object SkinManager {
         }
     }
 
-    fun init(context: Context){
-        mContext = context.applicationContext
+    fun init(application: Application){
+        mContext = application
+        application.registerActivityLifecycleCallbacks(SkinActivityLifecycleCallback())
     }
 
     fun loadSkinPath(skinPath:String){
@@ -84,6 +86,12 @@ object SkinManager {
         }
        throw Exception("请先调用init方法进行初始化")
     }
+
+    fun restoreDefault(){
+        mOutResources = null
+        changeSkin()
+    }
+    
 
     fun changeSkin() {
         mObserverMap.keys.forEach {

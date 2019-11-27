@@ -2,15 +2,16 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
+
 apply plugin: 'com.novoda.bintray-release'
 android {
-    compileSdkVersion Integer.parseInt(COMPILE_SDK_VERSION)
-    buildToolsVersion BUILDTOOLS_VERSION
+    compileSdkVersion 29
+    buildToolsVersion "29.0.2"
 
 
     defaultConfig {
-        minSdkVersion Integer.parseInt(MIN_SDK_VERSION)
-        targetSdkVersion Integer.parseInt(TARGET_SDK_VERSION)
+        minSdkVersion 15
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
 
@@ -30,9 +31,9 @@ android {
 publish {
     userOrg = 'thridlib'
     groupId = 'com.loufei.thridlib'
-    artifactId = 'androidx-skin'
-    publishVersion = '0.0.2'
-    desc = '基于Androidx的换肤框架'
+    artifactId = 'androidx-permission'
+    publishVersion = '0.0.1'
+    desc = '基于Aspectjd的权限申请框架'
     website = 'https://github.com/nobady/ThridLib.git'
 }
 
@@ -44,4 +45,5 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    implementation 'org.aspectj:aspectjrt:1.8.9'
 }

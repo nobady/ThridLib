@@ -1,2 +1,2 @@
-include ':app', ':androidx-skin'
+include ':app', ':androidx-skin', ':androidx-permission'
 rootProject.name='ThridLib'
