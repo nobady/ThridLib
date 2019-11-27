@@ -44,6 +44,23 @@ object SkinManager {
         application.registerActivityLifecycleCallbacks(SkinActivityLifecycleCallback())
     }
 
+    private fun saveSkinPath(skinPath: String){
+        val preferences = mContext?.getSharedPreferences("Skin_sp", Context.MODE_PRIVATE)
+        val edit = preferences?.edit()
+        edit?.putString("skinPath",skinPath)
+        edit?.apply()
+    }
+
+    private fun getCurrentSkinPath() =
+        mContext?.getSharedPreferences("Skin_sp", Context.MODE_PRIVATE)?.getString("skinPath","")
+
+
+    fun loadCurrentSkinPath(){
+        getCurrentSkinPath()?.let {
+            loadSkinPath(it)
+        }
+    }
+
     fun loadSkinPath(skinPath:String){
         val file = File(skinPath)
         takeIf { !file.exists() }?.apply { return }
@@ -62,6 +79,8 @@ object SkinManager {
                 //构建一个Resources对象来加载皮肤包中的资源，参考系统加载资源的实现方式
                 mOutResources = Resources(assetManager, mContext?.resources?.displayMetrics,
                     mContext?.resources?.configuration)
+                //将新的皮肤地址设置为当前皮肤地址
+                saveSkinPath(skinPath)
             }
         }catch (e:Exception){
             Log.e("SkinManager","加载皮肤时出异常，异常为：${e.message}")
@@ -88,6 +107,7 @@ object SkinManager {
     }
 
     fun restoreDefault(){
+        saveSkinPath("")
         mOutResources = null
         changeSkin()
     }

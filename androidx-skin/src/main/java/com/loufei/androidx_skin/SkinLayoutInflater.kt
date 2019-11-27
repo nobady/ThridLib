@@ -8,6 +8,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.collection.ArrayMap
 import java.lang.reflect.Constructor
+import kotlin.Exception
 
 /**
  * Created by lvtengfei on 2019-11-25.
@@ -39,6 +40,9 @@ class SkinLayoutInflater:LayoutInflater.Factory2 {
         createView?.let {
             collectionAttrs(it,context,attr)
         }
+
+        SkinManager.loadCurrentSkinPath()
+        SkinManager.changeSkin()
 
         return createView
     }
@@ -80,16 +84,24 @@ class SkinLayoutInflater:LayoutInflater.Factory2 {
             sClassPrefixList?.let { prefixs ->
                 prefixs.run {
                     prefixs.forEach {
-                        clazz = context.classLoader.loadClass("$it$name")
-                            .asSubclass(View::class.java) as Class<out View>?
-                        //类似于break
-                        clazz?.apply { return@run }
+                        try {
+                            clazz = context.classLoader.loadClass("$it$name")
+                                .asSubclass(View::class.java) as Class<out View>?
+                            //类似于break
+                            clazz?.apply { return@run }
+                        }catch (e:Exception){
+
+                        }
                     }
                 }
             }
             sClassPrefixList?:apply{
-                clazz = context.classLoader.loadClass(name)
-                    .asSubclass(View::class.java) as Class<out View>?
+                try {
+                    clazz = context.classLoader.loadClass(name)
+                        .asSubclass(View::class.java) as Class<out View>?
+                }catch (e:Exception){
+
+                }
             }
 
             constructor = clazz?.getConstructor(*sConstructorSignature)

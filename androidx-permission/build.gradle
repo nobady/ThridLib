@@ -32,9 +32,12 @@ publish {
     userOrg = 'thridlib'
     groupId = 'com.loufei.thridlib'
     artifactId = 'androidx-permission'
-    publishVersion = '0.0.1'
+    publishVersion = '0.0.5'
     desc = '基于Aspectjd的权限申请框架'
     website = 'https://github.com/nobady/ThridLib.git'
+    bintrayUser='nobady'
+    dryRun=false
+    bintrayKey='30ffea198c46e5e951f54e1a21c9f2b1254e583b'
 }
 
 dependencies {
@@ -42,6 +45,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.appcompat:appcompat:$ANDROIDX_APPCOMPAT"
     implementation "androidx.core:core-ktx:$ANDROIDX_CORE_KTX"
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'

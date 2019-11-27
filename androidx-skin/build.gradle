@@ -31,9 +31,13 @@ publish {
     userOrg = 'thridlib'
     groupId = 'com.loufei.thridlib'
     artifactId = 'androidx-skin'
-    publishVersion = '0.0.2'
+    publishVersion = '0.0.6'
     desc = '基于Androidx的换肤框架'
+
+    bintrayKey = '30ffea198c46e5e951f54e1a21c9f2b1254e583b'
     website = 'https://github.com/nobady/ThridLib.git'
+    bintrayUser='nobady'
+    dryRun=false
 }
 
 dependencies {

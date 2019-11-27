@@ -2,6 +2,7 @@ package com.loufei.androidx_permission
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.loufei.androidx_permission.annotation.PermissionCanceled
@@ -18,9 +19,9 @@ import org.aspectj.lang.annotation.Pointcut
 @Aspect
 class PermissionAspectj {
 
-    @Pointcut("execution(@com.loufei.androidx_permission.Permissions * *(..)) && @annotation(permissions)")
+    @Pointcut("execution(@com.loufei.androidx_permission.annotation.Permissions * *(..)) && @annotation(permissions)")
     fun requestPermission(permissions:Permissions){
-
+        Log.e("requestPermission","拦截")
     }
 
     @Around("requestPermission(permissions)")
@@ -33,6 +34,8 @@ class PermissionAspectj {
             is View -> context = any.context
             is Activity -> context = any
         }
+
+        Log.e("requestPermission","aroundJoinPoint")
 
         context?.let {
             if (PermissionManager.hasPermissions(it,permissions.permissions)){
