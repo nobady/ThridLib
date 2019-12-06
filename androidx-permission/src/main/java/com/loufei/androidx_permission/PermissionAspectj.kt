@@ -37,11 +37,11 @@ class PermissionAspectj {
 
         Log.e("requestPermission","aroundJoinPoint")
 
-        context?.let {
-            if (PermissionManager.hasPermissions(it,permissions.permissions)){
+        context?.let { context1 ->
+            if (PermissionManager.hasPermissions(context1,permissions.permissions)){
                 joinPoint.proceed()
             }else{
-                PermissionActivity.requestPermissions(it,permissions.permissions,object :IPermission{
+                PermissionActivity.requestPermissions(context1,permissions.permissions,object :IPermission{
                     override fun onGranted() {
                         joinPoint.proceed()
                     }

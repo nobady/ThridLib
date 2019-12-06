@@ -10,8 +10,6 @@ class SkinApplication:Application() {
     override fun onCreate() {
         super.onCreate()
         SkinManager.init(this)
-        SkinManager.loadSkinPath("皮肤路径")
-        SkinManager.changeSkin()
     }
 
 }

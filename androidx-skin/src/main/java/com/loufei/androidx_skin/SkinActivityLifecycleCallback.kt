@@ -38,8 +38,7 @@ class SkinActivityLifecycleCallback:Application.ActivityLifecycleCallbacks {
                 it.factory2 = layoutInflater
 
                 SkinManager.addSkinObserver(activity,layoutInflater)
-
-                SkinManager.changeSkin()
+//                SkinManager.loadSkin(SkinPreference.getSkinName()!!,SkinPreference.getSkinStrategy())
             }
         }
     }

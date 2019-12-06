@@ -31,7 +31,7 @@ publish {
     userOrg = 'thridlib'
     groupId = 'com.loufei.thridlib'
     artifactId = 'androidx-skin'
-    publishVersion = '0.0.6'
+    publishVersion = '0.0.8'
     desc = '基于Androidx的换肤框架'
 
     bintrayKey = '30ffea198c46e5e951f54e1a21c9f2b1254e583b'
@@ -48,4 +48,6 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.2"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2"
 }

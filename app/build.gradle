@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 apply plugin: 'kotlin-android'
-
+apply plugin: 'android-aspectjx'
 apply plugin: 'kotlin-android-extensions'
 
 android {
@@ -21,6 +21,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    sourceSets {
+        main {
+            res.srcDirs += "src/main/res-test"
+        }
+    }
 }
 
 dependencies {
@@ -28,8 +34,11 @@ dependencies {
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.appcompat:appcompat:$ANDROIDX_APPCOMPAT"
     implementation "androidx.core:core-ktx:$ANDROIDX_CORE_KTX"
+    implementation 'com.google.android.material:material:1.0.0'
     implementation "androidx.constraintlayout:constraintlayout:$CONSTRAINTLAYOUT"
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    implementation project(":androidx-permission")
+    implementation project(":androidx-skin")
 }

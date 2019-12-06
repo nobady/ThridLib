@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary_test">#775800</color>
+    <color name="colorPrimaryDark_test">#b47500</color>
+    <color name="colorAccent_test">#06b18d</color>
+    <color name="bg1_test">#67ba87</color>
+
+    <color name="tc_test">#ab4567</color>
+    <color name="textColor2_test">#bd4621</color>
+    <color name="textColor3_test">#564fdc</color>
+
+</resources>

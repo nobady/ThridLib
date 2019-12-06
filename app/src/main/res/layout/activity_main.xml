@@ -1,18 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/bg1"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <TextView
+
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:onClick="getPermission"
+        android:textColor="@color/colorPrimary"
+        android:text="获取权限"
+        />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="restoreDefault"
+        android:text="恢复默认"
+        android:textColor="@color/tc"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="loadSDSkin"
+        android:text="加载SD卡皮肤"
+        android:textColor="@color/textColor2"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="downloadSkin"
+        android:text="下载皮肤"
+        android:textColor="@color/textColor3"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="应用内换肤"
+        android:onClick="appSkin"
+        android:textColor="@color/tc"
+        />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_launcher_background"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.FloatingActionButton"
+        app:rippleColor="@color/bg1"
+        app:backgroundTint="@color/tc"
+        android:src="@drawable/ic_launcher_foreground"
+        />
+
+    <com.loufei.thridlib.CustomView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:textColors="@color/tc"
+        android:text="自定义view"
+        />
+
+
+
+</LinearLayout>

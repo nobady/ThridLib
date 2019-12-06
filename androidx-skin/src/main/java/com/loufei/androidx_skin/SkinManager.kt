@@ -5,15 +5,13 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
-import android.content.res.AssetManager
 import android.content.res.Resources
-import android.graphics.drawable.Drawable
+import android.util.AttributeSet
 import android.util.Log
-import android.view.LayoutInflater
 import androidx.collection.ArrayMap
-import androidx.core.content.ContextCompat
+import com.loufei.androidx_skin.strategy.*
+import kotlinx.coroutines.*
 import java.io.File
-import java.lang.Exception
 
 /**
  * Created by lvtengfei on 2019-11-25.
@@ -21,102 +19,142 @@ import java.lang.Exception
 @SuppressLint("StaticFieldLeak")
 object SkinManager {
 
-    private val mObserverMap = ArrayMap<Activity,SkinUpdateListener>()
-    private var mContext:Context? = null
-    private var mSkinPackName:String? = ""
-    private var mOutResources:Resources? = null
-    fun addSkinObserver(activity: Activity,layoutInflater: SkinLayoutInflater){
-        mObserverMap[activity] = object :SkinUpdateListener{
+    const val SKIN_LOAD_STRATEGY_DEFAULT = -1
+    const val SKIN_LOAD_STRATEGY_ASSETS = 0
+    const val SKIN_LOAD_STRATEGY_RES = 1
+    const val SKIN_LOAD_STRATEGY_SD = 2
+
+    private val mObserverMap = ArrayMap<Activity, SkinSupportListener>()
+    private lateinit var mContext: Context
+
+    private val mStrategyMap = ArrayMap<Int, SkinLoadStrategy>()
+
+
+    fun addSkinObserver(activity: Activity, layoutInflater: SkinLayoutInflater) {
+        mObserverMap[activity] = object : SkinSupportListener {
             override fun onSkinUpdate() {
+                Log.d("addSkinObserver","onSkinUpdate")
                 layoutInflater.changeSkin()
             }
         }
     }
 
-    fun removeObserver(activity: Activity){
+    fun removeObserver(activity: Activity) {
         takeIf { mObserverMap.contains(activity) }?.apply {
             mObserverMap.remove(activity)
         }
     }
 
-    fun init(application: Application){
+    fun init(application: Application) {
         mContext = application
         application.registerActivityLifecycleCallbacks(SkinActivityLifecycleCallback())
+        loadStrategy()
+        SkinPreference.init(mContext)
     }
 
-    private fun saveSkinPath(skinPath: String){
-        val preferences = mContext?.getSharedPreferences("Skin_sp", Context.MODE_PRIVATE)
-        val edit = preferences?.edit()
-        edit?.putString("skinPath",skinPath)
-        edit?.apply()
+    private fun loadStrategy(){
+        mStrategyMap[SKIN_LOAD_STRATEGY_ASSETS] = SkinAssetsLoader()
+        mStrategyMap[SKIN_LOAD_STRATEGY_RES] = SkinResLoader()
+        mStrategyMap[SKIN_LOAD_STRATEGY_SD] = SkinSDCardLoader()
+        mStrategyMap[SKIN_LOAD_STRATEGY_DEFAULT] = SkinDefaultLoader()
     }
 
-    private fun getCurrentSkinPath() =
-        mContext?.getSharedPreferences("Skin_sp", Context.MODE_PRIVATE)?.getString("skinPath","")
-
-
-    fun loadCurrentSkinPath(){
-        getCurrentSkinPath()?.let {
-            loadSkinPath(it)
-        }
-    }
-
-    fun loadSkinPath(skinPath:String){
-        val file = File(skinPath)
-        takeIf { !file.exists() }?.apply { return }
-
-        try {
-            mContext?.let {
-                val packageManager = it.packageManager
-                val packageInfo =
-                    packageManager.getPackageArchiveInfo(skinPath, PackageManager.GET_ACTIVITIES)
-                mSkinPackName = packageInfo?.packageName
-                //通过反射加载外部的资源包
-                val assetManager = AssetManager::class.java.newInstance()
-                val method = assetManager.javaClass.getMethod("addAssetPath", String::class.java)
-                method.isAccessible = true
-                method.invoke(assetManager,skinPath)
-                //构建一个Resources对象来加载皮肤包中的资源，参考系统加载资源的实现方式
-                mOutResources = Resources(assetManager, mContext?.resources?.displayMetrics,
-                    mContext?.resources?.configuration)
-                //将新的皮肤地址设置为当前皮肤地址
-                saveSkinPath(skinPath)
+    /**
+     * 加载皮肤
+     */
+    fun loadSkin(skinName:String,strategy: Int){
+        val coroutineScope = CoroutineScope(Dispatchers.IO)
+        val block: suspend CoroutineScope.() -> Unit = {
+            val background =
+                mStrategyMap[strategy]?.loadSkinInBackground(mContext, skinName)
+            withContext(Dispatchers.Main) {
+                SkinPreference.setSkinName(skinName).setSkinStrategy(strategy).commitEditor()
+                changeSkin()
+                cancel()
             }
-        }catch (e:Exception){
-            Log.e("SkinManager","加载皮肤时出异常，异常为：${e.message}")
         }
+        val job = coroutineScope.launch(block = block)
     }
-
-    fun getColor(resName:String,resId:Int): Int? {
-        mOutResources?:return mContext?.resources?.getColor(resId)
-
-        val id = mOutResources?.getIdentifier(resName, "color", mSkinPackName)
-        takeIf { id==0 }?.apply { return resId }
-        return mOutResources?.getColor(id!!)
-    }
-
-    fun getDrawable(resName:String,resId:Int):Drawable?{
-        mContext?.let {
-            mOutResources?:return ContextCompat.getDrawable(it,resId)
-            val id = mOutResources?.getIdentifier(resName, "background", mSkinPackName)
-            takeIf { id==0 }?.apply { return ContextCompat.getDrawable(it,resId) }
-
-            return mOutResources?.getDrawable(id!!)
+    //为某一个view进行换肤
+    fun loadSkinForSingleView(skinItems:ArrayList<SkinItem>,skinName:String,strategy: Int){
+        val coroutineScope = CoroutineScope(Dispatchers.IO)
+        val block: suspend CoroutineScope.() -> Unit = {
+            val background =
+                mStrategyMap[strategy]?.loadSkinInBackground(mContext, skinName)
+            withContext(Dispatchers.Main) {
+                SkinPreference.setSkinName(skinName).setSkinStrategy(strategy).commitEditor()
+                skinItems.forEach {
+                    it.applySkin()
+                    if ((it.view is SkinSupportListener)) {
+                        it.view.onSkinUpdate()
+                    }
+                }
+                cancel()
+            }
         }
-       throw Exception("请先调用init方法进行初始化")
+        val job = coroutineScope.launch(block = block)
     }
 
-    fun restoreDefault(){
-        saveSkinPath("")
-        mOutResources = null
-        changeSkin()
-    }
-    
+    fun getColor(resId: Int) = SkinResources.getColor(mContext,resId)
+    fun getColorStatList(resId: Int) = SkinResources.getColorStatList(mContext,resId)
 
-    fun changeSkin() {
+
+    fun getDrawable(resId: Int) = SkinResources.getDrawable(mContext,resId)
+
+    fun restoreDefault() {
+        loadSkin("", SKIN_LOAD_STRATEGY_DEFAULT)
+    }
+
+    private fun changeSkin() {
         mObserverMap.keys.forEach {
+            Log.d("mObserverMap","$it")
             mObserverMap[it]?.onSkinUpdate()
         }
+    }
+
+
+    fun getSkinPkgName(skinPath: String): String {
+        mContext.packageManager.getPackageArchiveInfo(skinPath, PackageManager.GET_ACTIVITIES)
+            ?.let {
+                return it.packageName
+            }
+        return mContext.packageName
+    }
+
+    @Deprecated("")
+    fun getSkinResource(skinPath: String): Resources {
+
+        val packageArchiveInfo = mContext.packageManager.getPackageArchiveInfo(skinPath, 0)
+        packageArchiveInfo?.let {
+            it.applicationInfo.sourceDir = skinPath
+            it.applicationInfo.publicSourceDir = skinPath
+            val resources =
+                mContext.packageManager.getResourcesForApplication(it.applicationInfo)
+            return Resources(
+                resources.assets,
+                mContext.resources.displayMetrics,
+                mContext.resources.configuration
+            )
+        }
+        return mContext.resources
+    }
+
+    //获取下载皮肤的路径
+    fun getSDSkinPath(skinName: String): String {
+        File(SkinFileUtils.getSkinDir(mContext),skinName).createNewFile()
+        return File(SkinFileUtils.getSkinDir(mContext),skinName).absolutePath
+    }
+
+    //获取自定义view中属性对应的id
+    fun getCustomViewAttrResId(attributeSet: AttributeSet,supportAttrName:String): Int {
+        attributeSet.attributeCount.downTo(1).forEach { index ->
+            val attributeName = attributeSet.getAttributeName(index - 1)
+            val attributeValue = attributeSet.getAttributeValue(index - 1)
+            attributeName?.takeIf { it == supportAttrName }?.let {
+                return attributeValue.substring(1).toInt()
+            }
+        }
+        return 0
     }
 
 }

@@ -53,7 +53,7 @@ class PermissionActivity:AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        takeIf { requestCode==this.requestCode }?.run {
+         takeIf { requestCode==this.requestCode }?.run {
             when {
                 PermissionManager.verifyPermissions(grantResults) -> {
                     permissionListener?.onGranted()
