@@ -4,7 +4,7 @@
 
 1. 添加引用
 
-        implementation 'com.loufei.thridlib:androidx-skin:0.0.6'
+        implementation 'com.loufei.thridlib:androidx-skin:0.0.8'
 
 2. 在Application中初始化
 
